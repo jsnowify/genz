@@ -1,176 +1,140 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import { Link, usePage } from "@inertiajs/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+export default function AuthenticatedLayout({ children }) {
+    const { url, props } = usePage();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const username = props.auth.user.username;
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 50);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
+        <div className="min-h-screen bg-gray-50 text-gray-900">
+            <nav
+                className={`fixed top-0 left-0 w-full backdrop-blur-md transition-all duration-300 ${
+                    scrolled ? "shadow-md bg-white/80" : "bg-white/50"
+                } z-50`}
+            >
+                <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
+                    <Link
+                        href="/"
+                        className="text-2xl font-extrabold tracking-tight"
+                        onClick={() => setMenuOpen(false)}
+                        prefetch
+                    >
+                        GenZ
+                    </Link>
+
+                    <div className="hidden md:flex space-x-6 absolute left-1/2 transform -translate-x-1/2">
+                        {navLinks.map((item) => (
+                            <NavItem
+                                key={item.href}
+                                href={item.href}
+                                isActive={url === item.href}
+                            />
+                        ))}
+                    </div>
+
+                    <div className="relative">
+                        <button
+                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                            className="flex items-center text-gray-700 hover:text-gray-900 focus:outline-none"
+                        >
+                            @{username}
+                            <ChevronDown className="ml-2 h-4 w-4" />
+                        </button>
+                        {dropdownOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-md py-2">
+                                <Link
+                                    href="/profile"
+                                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                >
+                                    Settings
+                                </Link>
+                                <Link
+                                    href="/logout"
+                                    method="post"
+                                    as="button" // Make it behave like a button
+                                    className="block w-full px-4 py-2 text-gray-700 hover:bg-gray-100 text-left"
+                                >
+                                    Logout
                                 </Link>
                             </div>
-
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                        </div>
-
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
-                                            Profile
-                                        </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
-                                            as="button"
-                                        >
-                                            Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
-                            </div>
-                        </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
+                        )}
                     </div>
                 </div>
             </nav>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        {header}
-                    </div>
-                </header>
-            )}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={
+                    menuOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }
+                }
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className={`absolute top-16 left-0 w-full bg-white/90 shadow-lg p-4 rounded-md md:hidden ${
+                    menuOpen ? "block" : "hidden"
+                }`}
+            >
+                <div className="flex flex-col items-center space-y-3">
+                    {navLinks.map((item) => (
+                        <NavItem
+                            key={item.href}
+                            href={item.href}
+                            isActive={url === item.href}
+                        />
+                    ))}
+                </div>
+            </motion.div>
 
-            <main>{children}</main>
+            <AnimatePresence mode="wait">
+                <motion.main
+                    key={url}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="mt-16 px-6 py-8"
+                >
+                    {children}
+                </motion.main>
+            </AnimatePresence>
         </div>
     );
 }
+
+function NavItem({ href, isActive }) {
+    const label = href.replace("/", "");
+    const formattedLabel = label.charAt(0).toUpperCase() + label.slice(1);
+
+    return (
+        <Link
+            href={href}
+            className="relative px-4 py-2 text-gray-700 transition-all duration-300 hover:text-gray-900"
+        >
+            {formattedLabel || "Home"}
+            {isActive && (
+                <motion.div
+                    layoutId="underline"
+                    className="absolute left-0 bottom-0 h-1 w-full bg-gray-900 rounded-md"
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                />
+            )}
+        </Link>
+    );
+}
+
+const navLinks = [
+    { href: "/home", label: "Home" },
+    { href: "/rant", label: "Rant" },
+    { href: "/explore", label: "Explore" },
+    { href: "/notification", label: "Notification" },
+];

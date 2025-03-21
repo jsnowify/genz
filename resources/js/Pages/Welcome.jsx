@@ -1,32 +1,34 @@
-import { Head, Link, usePage } from "@inertiajs/react";
+import React, { useEffect } from "react";
+import { Head, usePage, router } from "@inertiajs/react";
 
 export default function Welcome() {
-    const { auth } = usePage().props; // Get authentication data from Inertia props
+    const { auth } = usePage().props;
 
-    if (auth?.user) {
-        // If user is logged in, redirect to dashboard
-        window.location.href = route("dashboard");
-        return null;
-    }
+    useEffect(() => {
+        if (auth?.user) {
+            router.visit("/home"); // Redirect to home if logged in
+        }
+    }, [auth]);
 
     return (
         <>
             <Head title="Welcome" />
-            <div className="flex min-h-screen items-center justify-center bg-white text-black">
-                <div className="text-center">
-                    <h1 className="text-6xl font-extrabold tracking-wide">
-                        GenZ
+            <div className="flex items-center justify-center min-h-screen bg-white text-black">
+                <div className="text-center px-6 sm:px-12 max-w-lg">
+                    <h1 className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
+                        Welcome to GenZ
                     </h1>
-                    <p className="mt-3 text-lg text-gray-600">
-                        A new way to connect, create, and share.
+                    <p className="mt-4 text-lg text-gray-600">
+                        Connect, share, and explore the world of trends and
+                        ideas.
                     </p>
-                    <div className="mt-6 space-x-4">
-                        <Link
-                            href={route("register")}
-                            className="px-6 py-3 text-lg font-medium bg-black text-white rounded-lg transition hover:bg-gray-900"
+                    <div className="mt-6">
+                        <button
+                            onClick={() => router.visit("/login")}
+                            className="px-6 py-3 bg-black text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition"
                         >
                             Get Started
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </div>

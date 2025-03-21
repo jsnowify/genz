@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         // Redirect to the intended page or dashboard
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('home', absolute: false));
     }
 
     /**
@@ -54,7 +54,8 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Redirect to home or login page
-        return redirect()->route('login');
+        // Redirect logged-out users to the Welcome page
+        return redirect()->route('welcome');
     }
+
 }

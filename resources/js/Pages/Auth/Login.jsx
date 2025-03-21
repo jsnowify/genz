@@ -34,14 +34,13 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="max-w-sm mx-auto space-y-4">
                 {/* Username Field */}
                 <div>
-                    <InputLabel htmlFor="username" value="Username" />
-
+                    <InputLabel htmlFor="username" value="Email address" />
                     <TextInput
                         id="username"
-                        type="text" // FIXED: "username" is not a valid type
+                        type="text"
                         name="username"
                         value={data.username}
                         className="mt-1 block w-full"
@@ -49,14 +48,12 @@ export default function Login({ status, canResetPassword }) {
                         isFocused={true}
                         onChange={(e) => setData("username", e.target.value)}
                     />
-
                     <InputError message={errors.username} className="mt-2" />
                 </div>
 
                 {/* Password Field */}
-                <div className="mt-4">
+                <div>
                     <InputLabel htmlFor="password" value="Password" />
-
                     <TextInput
                         id="password"
                         type="password"
@@ -66,12 +63,11 @@ export default function Login({ status, canResetPassword }) {
                         autoComplete="current-password"
                         onChange={(e) => setData("password", e.target.value)}
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                {/* Remember Me Checkbox */}
-                <div className="mt-4 block">
+                {/* Remember Me & Forgot Password */}
+                <div className="flex items-center justify-between">
                     <label className="flex items-center">
                         <Checkbox
                             name="remember"
@@ -79,29 +75,52 @@ export default function Login({ status, canResetPassword }) {
                             onChange={(e) =>
                                 setData("remember", e.target.checked)
                             }
-                            aria-label="Remember me"
                         />
                         <span className="ml-2 text-sm text-gray-600">
                             Remember me
                         </span>
                     </label>
-                </div>
 
-                {/* Actions: Forgot Password & Submit */}
-                <div className="mt-4 flex items-center justify-end">
                     {canResetPassword && (
                         <Link
                             href={route("password.request")}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="text-sm text-blue-600 hover:underline"
                         >
-                            Forgot your password?
+                            Forgot password?
                         </Link>
                     )}
-
-                    <PrimaryButton className="ml-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
                 </div>
+
+                {/* Login Button */}
+                <PrimaryButton className="w-full" disabled={processing}>
+                    Sign in
+                </PrimaryButton>
+
+                {/* Google Sign-in Button */}
+                <button
+                    type="button"
+                    className="w-full flex items-center justify-center space-x-2 border rounded-md py-2 bg-white shadow-sm hover:bg-gray-100"
+                >
+                    <img
+                        src="../../assets/google-icon.svg"
+                        alt="Google"
+                        className="w-5 h-5"
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                        Sign in with Google
+                    </span>
+                </button>
+
+                {/* Register Link */}
+                <p className="text-center text-sm text-gray-600">
+                    Don't have an account?{" "}
+                    <Link
+                        href={route("register")}
+                        className="text-blue-600 font-medium hover:underline"
+                    >
+                        Sign up
+                    </Link>
+                </p>
             </form>
         </GuestLayout>
     );
